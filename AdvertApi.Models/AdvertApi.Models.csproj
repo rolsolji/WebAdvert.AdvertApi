@@ -2,6 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Authors>Rolando S.</Authors>
+    <Company>None</Company>
+    <Product>Web Advert Microservices</Product>
+    <PackageProjectUrl>https://github.com/rolsolji/WebAdvert.AdvertApi</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/rolsolji/WebAdvert.AdvertApi</RepositoryUrl>
+    <PackageId>AdvertApi.Models_RSJ</PackageId>
   </PropertyGroup>
 
 </Project>
