@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using AdvertApi.Models.Messages;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Cors;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,6 +17,7 @@ namespace AdvertApi.Controllers
 {
     [ApiController]
     [Route("adverts/v1")]
+    [Produces("application/json")]
     public class Advert : ControllerBase
     {
         private readonly IAdvertStorageService _advertStorageService;
@@ -37,7 +39,7 @@ namespace AdvertApi.Controllers
             string recordId;
             try
             {
-                recordId = await _advertStorageService.Add(model);
+                recordId = await _advertStorageService.AddAsync(model);
             }
             catch (KeyNotFoundException)
             {
@@ -60,7 +62,7 @@ namespace AdvertApi.Controllers
         {
             try
             {
-                await _advertStorageService.Confirm(model);
+                await _advertStorageService.ConfirmAsync(model);
                 await RaiseAdvertConfirmedMessage(model);
             }
             catch (KeyNotFoundException)
@@ -90,6 +92,36 @@ namespace AdvertApi.Controllers
                 var messageJson = JsonConvert.SerializeObject(message);
                 await client.PublishAsync(topicArn, messageJson); ;
             }
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> Get(string id)
+        {
+            try
+            {
+                var advert = await _advertStorageService.GetByIdAsync(id);
+                return new JsonResult(advert);
+            }
+            catch (KeyNotFoundException)
+            {
+                return new NotFoundResult();
+            }
+            catch (Exception)
+            {
+                return new StatusCodeResult(500);
+            }
+        }
+
+        [HttpGet]
+        [Route("all")]
+        [ProducesResponseType(200)]
+        [EnableCors("AllOrigin")]
+        public async Task<IActionResult> All()
+        {
+            return new JsonResult(await _advertStorageService.GetAllAsync());
         }
     }
 }

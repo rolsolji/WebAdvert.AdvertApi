@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -8,6 +8,8 @@
     <PackageProjectUrl>https://github.com/rolsolji/WebAdvert.AdvertApi</PackageProjectUrl>
     <RepositoryUrl>https://github.com/rolsolji/WebAdvert.AdvertApi</RepositoryUrl>
     <PackageId>AdvertApi.Models_RSJ</PackageId>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
 </Project>

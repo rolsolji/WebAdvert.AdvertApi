@@ -18,7 +18,7 @@ namespace AdvertApi.Services
             _mapper = mapper;
         }
 
-        public async Task<string> Add(AdvertModel model)
+        public async Task<string> AddAsync(AdvertModel model)
         {
             var dbModel = _mapper.Map<AdvertDbModel>(model);
 
@@ -37,7 +37,7 @@ namespace AdvertApi.Services
             return dbModel.Id;
         }
 
-        public async Task Confirm(ConfirmAdvertModel model)
+        public async Task ConfirmAsync(ConfirmAdvertModel model)
         {           
             using (var client = new AmazonDynamoDBClient())
             {
@@ -51,6 +51,7 @@ namespace AdvertApi.Services
 
                     if (model.Status == AdvertStatus.Active)
                     {
+                        record.FilePath = model.FilePath;
                         record.Status = AdvertStatus.Active;
                         await context.SaveAsync(record);
                     }
@@ -78,6 +79,33 @@ namespace AdvertApi.Services
                 var excep = e.Message;
                 return false;
             }
+        }
+
+        public async Task<List<AdvertModel>> GetAllAsync()
+        {
+            using (var client = new AmazonDynamoDBClient())
+            {
+                using (var context = new DynamoDBContext(client))
+                {
+                    var scanResult =
+                        await context.ScanAsync<AdvertDbModel>(new List<ScanCondition>()).GetNextSetAsync();
+                    return scanResult.Select(item => _mapper.Map<AdvertModel>(item)).ToList();
+                }
+            }
+        }
+
+        public async Task<AdvertModel> GetByIdAsync(string id)
+        {
+            using (var client = new AmazonDynamoDBClient())
+            {
+                using (var context = new DynamoDBContext(client))
+                {
+                    var dbModel = await context.LoadAsync<AdvertDbModel>(id);
+                    if (dbModel != null) return _mapper.Map<AdvertModel>(dbModel);
+                }
+            }
+
+            throw new KeyNotFoundException();
         }
     }
 }
